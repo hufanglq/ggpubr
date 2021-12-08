@@ -360,6 +360,14 @@ guess_labels_default_vjust <- function(labels){
 remove_ns <- function(data){
   filter <- dplyr::filter
   columns <- colnames(data)
+  
+  if(nrow(data)>1){
+    stp <- data$y.position[1:2] %>% diff
+    if (colnames(data)[1]!='.y.')
+      data <- data %>% dplyr::group_by(!!!syms(colnames(.)[1]))
+    data <- data %>% dplyr::mutate(gr.y.min=min(y.position))
+  }
+  
   if("p.adj.signif" %in% columns){
     data <- data %>% filter(.data$p.adj.signif != "ns")
   }
@@ -371,6 +379,14 @@ remove_ns <- function(data){
   }
   else if("p" %in% columns){
     data <- data %>% filter(.data$p <= 0.05)
+  }
+  
+  if(nrow(data)>1){
+    data <- data %>%
+      dplyr::mutate(ncount=dplyr::row_number(),
+                    y.position=gr.y.min+(ncount-1)*stp) %>%
+      dplyr::select(-gr.y.min, -ncount) %>%
+      dplyr::ungroup()
   }
   data
 }
