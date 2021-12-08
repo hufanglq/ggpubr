@@ -369,13 +369,13 @@ remove_ns <- function(data){
   }
   
   if("p.adj.signif" %in% columns){
-    data <- data %>% filter(.data$p.adj.signif != "ns")
+    data <- data %>% filter(! .data$p.adj.signif %in% c("ns",""))
   }
   else if("p.adj" %in% columns){
     data <- data %>% filter(.data$p.adj <= 0.05)
   }
   else if("p.signif" %in% columns){
-    data <- data %>% filter(.data$p.signif != "ns")
+    data <- data %>% filter(! .data$p.signif %in% c("ns",""))
   }
   else if("p" %in% columns){
     data <- data %>% filter(.data$p <= 0.05)
